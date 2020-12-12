@@ -12,13 +12,13 @@
 #include <type_traits> // is_same
 #include <utility> // move
 
-#include <nlohmann/detail/conversions/to_chars.hpp>
-#include <nlohmann/detail/exceptions.hpp>
-#include <nlohmann/detail/macro_scope.hpp>
-#include <nlohmann/detail/meta/cpp_future.hpp>
-#include <nlohmann/detail/output/binary_writer.hpp>
-#include <nlohmann/detail/output/output_adapters.hpp>
-#include <nlohmann/detail/value_t.hpp>
+#include "include/nlohmann/detail/conversions/to_chars.hpp"
+#include "include/nlohmann/detail/exceptions.hpp"
+#include "include/nlohmann/detail/macro_scope.hpp"
+#include "include/nlohmann/detail/meta/cpp_future.hpp"
+#include "include/nlohmann/detail/output/binary_writer.hpp"
+#include "include/nlohmann/detail/output/output_adapters.hpp"
+#include "include/nlohmann/detail/value_t.hpp"
 
 namespace nlohmann
 {
@@ -881,7 +881,6 @@ class serializer
             }
         };
 
-        JSON_ASSERT(byte < utf8d.size());
         const std::uint8_t type = utf8d[byte];
 
         codep = (state != UTF8_ACCEPT)

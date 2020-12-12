@@ -12605,14 +12605,19 @@ class json_ref
 
     json_ref(value_type&& value)
         : owned_value(std::move(value))
+        , value_ref(&owned_value)
+        , is_rvalue(true)
     {}
 
     json_ref(const value_type& value)
-        : value_ref(&value)
+        : value_ref(const_cast<value_type*>(&value))
+        , is_rvalue(false)
     {}
 
     json_ref(std::initializer_list<json_ref> init)
         : owned_value(init)
+        , value_ref(&owned_value)
+        , is_rvalue(true)
     {}
 
     template <
@@ -12620,6 +12625,8 @@ class json_ref
         enable_if_t<std::is_constructible<value_type, Args...>::value, int> = 0 >
     json_ref(Args && ... args)
         : owned_value(std::forward<Args>(args)...)
+        , value_ref(&owned_value)
+        , is_rvalue(true)
     {}
 
     // class should be movable only
@@ -12631,26 +12638,27 @@ class json_ref
 
     value_type moved_or_copied() const
     {
-        if (value_ref == nullptr)
+        if (is_rvalue)
         {
-            return std::move(owned_value);
+            return std::move(*value_ref);
         }
         return *value_ref;
     }
 
     value_type const& operator*() const
     {
-        return value_ref ? *value_ref : owned_value;
+        return *static_cast<value_type const*>(value_ref);
     }
 
     value_type const* operator->() const
     {
-        return &**this;
+        return static_cast<value_type const*>(value_ref);
     }
 
   private:
     mutable value_type owned_value = nullptr;
-    value_type const* value_ref = nullptr;
+    value_type* value_ref = nullptr;
+    const bool is_rvalue = true;
 };
 }  // namespace detail
 }  // namespace nlohmann
@@ -16384,7 +16392,6 @@ class serializer
             }
         };
 
-        JSON_ASSERT(byte < utf8d.size());
         const std::uint8_t type = utf8d[byte];
 
         codep = (state != UTF8_ACCEPT)
@@ -16626,19 +16633,6 @@ template <class Key, class T, class IgnoredLess = std::less<Key>,
         }
         Container::push_back(value);
         return {--this->end(), true};
-    }
-
-    template<typename InputIt>
-    using require_input_iter = typename std::enable_if<std::is_convertible<typename std::iterator_traits<InputIt>::iterator_category,
-            std::input_iterator_tag>::value>::type;
-
-    template<typename InputIt, typename = require_input_iter<InputIt>>
-    void insert(InputIt first, InputIt last)
-    {
-        for (auto it = first; it != last; ++it)
-        {
-            insert(*it);
-        }
     }
 };
 
