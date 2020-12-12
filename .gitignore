@@ -40,7 +40,7 @@ doc/xml
 .clwb/
 
 # Bazel 
-bazel-bin/
-bazel-json/
-bazel-out/
-bazel-testlogs/
+bazel-bin
+bazel-json
+bazel-out
+bazel-testlogs
