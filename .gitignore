@@ -34,3 +34,13 @@ doc/mkdocs/site
 doc/mkdocs/docs/__pycache__/
 doc/xml
 /doc/docset/nlohmann_json.docset/
+
+
+# Clion with bazel 
+.clwb/
+
+# Bazel 
+bazel-bin/
+bazel-json/
+bazel-out/
+bazel-testlogs/
